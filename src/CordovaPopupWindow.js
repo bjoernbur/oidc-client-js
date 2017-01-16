@@ -2,13 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 import Log from './Log';
+import CordovaPopupWindowEvents from './CordovaPopupWindowEvents';
 
 const DefaultPopupFeatures = 'location=no,toolbar=no,zoom=no';
 const DefaultPopupTarget = "_blank";
 
 export default class CordovaPopupWindow {
 
-    constructor(params) {
+  constructor(params, events) {
         Log.info("CordovaPopupWindow.ctor");
 
         this._promise = new Promise((resolve, reject) => {
@@ -16,6 +17,8 @@ export default class CordovaPopupWindow {
             this._reject = reject;
         });
 
+        this._events = events || new CordovaPopupWindowEvents();
+      
         this.features = params.popupWindowFeatures || DefaultPopupFeatures;
         this.target = params.popupWindowTarget || DefaultPopupTarget;
         
@@ -29,7 +32,7 @@ export default class CordovaPopupWindow {
         })
     }
     
-    navigate(params) {
+  navigate(params) {
         Log.info("CordovaPopupWindow.navigate");
 
         if (!params || !params.url) {
@@ -66,8 +69,11 @@ export default class CordovaPopupWindow {
     _loadStartCallback(event) {
         if (event.url.indexOf(this.redirect_uri) === 0) {
             this._success({ url: event.url });
-        }    
+        }
+
+        this._events.load(event, this._popup);
     }
+  
     _exitCallback(message) {
         this._error(message);    
     }

@@ -3,12 +3,20 @@
 
 import Log from './Log';
 import CordovaPopupWindow from './CordovaPopupWindow';
+import CordovaPopupWindowEvents from './CordovaPopupWindowEvents';
 
 export default class CordovaIFrameNavigator {
-    
-    prepare(params) {
-        params.popupWindowFeatures = 'hidden=yes';
-        let popup = new CordovaPopupWindow(params);
-        return Promise.resolve(popup);
-    }
+  constructor(params) {
+    this._events = new CordovaPopupWindowEvents();
+  }
+  
+  prepare(params) {
+    params.popupWindowFeatures = 'hidden=yes';
+    var popup = new CordovaPopupWindow(params, this._events);
+    return Promise.resolve(popup);
+  }
+
+  get events() {
+    return this._events;
+  }
 }
